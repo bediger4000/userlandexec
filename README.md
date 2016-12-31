@@ -1,14 +1,17 @@
 # userlandexec
 ## userland exec for Linux x86_64
 
-This code emulates an `exec()` system call. That is, it reads and ELF format file,
-and loads it into memory at the right place, and then starts the newly-loaded
+This code emulates an `exec()` system call. That is, it reads an ELF format file,
+and loads it into memory at the correct address. It then starts the newly-loaded
 executable to running.
 
 All this is usually done by the Linux kernel, so some bizarre things go on.
 For starters, the userland exec unmaps the currently-executing ELF file,
 so as to be able to put the new ELF file's contents in the right place
 in memory.
+
+This code works with 64-bit Linux ELF files, compiled with GCC and linked against glibc.
+Other C runtimes (Musl libc, for example) cause errors mysterious to me.
 
 ### Building
 
