@@ -30,7 +30,7 @@ void c_main(int ac, char **av, char **env)
 	int how_to_map = 0;
 	void *mapped;
 	void *entry_point;
-	struct stat sb;
+	unsigned long dummy;
 	Elf64_Ehdr *elf_ehdr, *ldso_ehdr;
 	struct saved_block *argvb, *envb, *elfauxvb;
 	int trim_args;
@@ -55,12 +55,12 @@ void c_main(int ac, char **av, char **env)
 	if (file_to_unmap)
 		unmap(file_to_unmap);
 
-	mapped = map_file(file_to_map);
+	mapped = map_file(file_to_map, &dummy);
 	elf_ehdr = (Elf64_Ehdr *)mapped;
 
 	entry_point = load_elf(mapped, how_to_map, &elf_ehdr, &ldso_ehdr);
 
-	linux_munmap(mapped, sb.st_size);
+	linux_munmap(mapped, dummy);
 
 	argvb = save_argv(ac - trim_args, &av[trim_args]);
 	envb = save_argv(0, env);
