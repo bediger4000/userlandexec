@@ -24,27 +24,33 @@ print_maps(void)
 void
 ulexec(int ac, char **av, char **env)
 {
-	char *file_to_map = av[3];
-	char *file_to_unmap = av[2];
+	char *file_to_map;
+	char *file_to_unmap;
 	int how_to_map = 0;
 	void *mapped;
 	void *entry_point;
-	struct stat sb;
 	Elf64_Ehdr *elf_ehdr, *ldso_ehdr;
 	Elf64_Phdr *phdr;
 	struct saved_block *argvb, *envb, *elfauxvb;
 	int trim_args, i;
 	void *stack_bottom;
+	unsigned long mapped_sz;
 
 	file_to_map = av[2];
 	file_to_unmap = av[0];
 	how_to_map = 0;
 	trim_args = 2;
 
-	if (file_to_unmap)
-		unmap(file_to_unmap);
 
-	mapped = map_file(file_to_map);
+	if (file_to_unmap)
+	{
+		char *s = strrchr(file_to_unmap, '/');
+		if (s)
+			file_to_unmap = s;
+		unmap(file_to_unmap);
+	}
+
+	mapped = map_file(file_to_map, &mapped_sz);
 	elf_ehdr = (Elf64_Ehdr *)mapped;
 
 	phdr = (Elf64_Phdr *)((unsigned long)elf_ehdr + elf_ehdr->e_phoff);
@@ -58,7 +64,7 @@ ulexec(int ac, char **av, char **env)
 
 	entry_point = load_elf(mapped, how_to_map, &elf_ehdr, &ldso_ehdr);
 
-	linux_munmap(mapped, sb.st_size);
+	linux_munmap(mapped, mapped_sz);
 
 	argvb = save_argv(ac - trim_args, &av[trim_args]);
 	envb = save_argv(0, env);
