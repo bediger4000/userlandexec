@@ -7,7 +7,7 @@
 #include <ulexec.h>
 
 void *
-map_file(char *file_to_map)
+map_file(char *file_to_map, unsigned long *sz)
 {
 	struct stat sb;
 	void *mapped;
@@ -17,6 +17,8 @@ map_file(char *file_to_map)
 		error_msg("map_file stat() failed ");
 		linux_exit(1);
 	}
+
+	*sz = sb.st_size;
 
 	mapped = linux_mmap(NULL, sb.st_size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 

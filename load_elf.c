@@ -122,7 +122,8 @@ load_elf(char *mapped, int anywhere, Elf64_Ehdr **elf_ehdr, Elf64_Ehdr **ldso_eh
 	if (interp)
 	{
 		Elf64_Ehdr *junk_ehdr = NULL;
-		entry_point = load_elf(map_file(&(((char *)mapped)[interp->p_offset])), 1, ldso_ehdr, &junk_ehdr);
+		unsigned long sz_dummy;
+		entry_point = load_elf(map_file(&(((char *)mapped)[interp->p_offset]), &sz_dummy), 1, ldso_ehdr, &junk_ehdr);
 	}
 
 	if (!anywhere)
